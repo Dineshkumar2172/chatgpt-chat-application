@@ -7,9 +7,10 @@ dotenv.config();
 const router = express.Router();
 
 router.post("/text", async (req, res) => {
+    console.log("inside points")
     try {
         const { text, activeChatId} = req.body;
-        console.log("🚀 ~ file: openai.js:12 ~ router.post ~ text:", text);
+        console.log("text", text);
         res.status(200).json({ text });
     } catch (error) {
         console.log("error : ", error);

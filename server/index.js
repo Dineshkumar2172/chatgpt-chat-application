@@ -27,6 +27,11 @@ export const openai = new OpenAIApi(configuration);
 /* ROUTES */
 app.use('/openai', openAiRoutes);
 
+app.post('/', (req, res) => {
+    console.log("inside endpoint")
+    res.send('POST request to the homepage')
+  })
+
 /* SERVER SETUP */
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
