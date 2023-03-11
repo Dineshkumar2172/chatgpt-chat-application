@@ -7,14 +7,47 @@ dotenv.config();
 const router = express.Router();
 
 router.post("/text", async (req, res) => {
-    console.log("inside points")
     try {
-        const { text, activeChatId} = req.body;
-        console.log("text", text);
-        res.status(200).json({ text });
+        const { text, activeChatId } = req.body;
+        console.log("req.body:", req.body);
+
+        console.log("loading...")
+        console.log("PROJECT_ID :: ", process.env.PROJECT_ID);
+        console.log("BOT_USER_NAME :: ", process.env.BOT_USER_NAME);
+        console.log("BOT_USER_SECRET :: ", process.env.BOT_USER_SECRET);
+        console.log("text :: ", text);
+        let response;
+        try {
+             response = await openai.createCompletion({
+                model: "text-davinci-003",
+                prompt: text,
+                temperature: 0.5,
+                max_tokens: 2048,
+                top_p: 1,
+                frequency_penalty: 0.5,
+                presence_penalty: 0,
+            });
+        } catch (error) {
+            console.log("first request error : ", error);
+        }
+
+        console.log("response data :: ", response.data);
+        await axios.post(
+            `https://api.chatengine.io/chats/${activeChatId}/messages/`,
+            {   text: response.data.choices[0].text },
+            {
+                headers: {
+                    "Project-ID": process.env.PROJECT_ID,
+                    "User-Name": process.env.BOT_USER_NAME,
+                    "User-Secret": process.env.BOT_USER_SECRET,
+                },
+            }
+        );
+
+        res.status(200).json({ text: response.data.choices[0].text });
     } catch (error) {
-        console.log("error : ", error);
-        res.status(500).json({ error: error.message })
+        console.error("error", error);
+        res.status(500).json({ error: error.message });
     }
 });
 
